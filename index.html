@@ -91,6 +91,13 @@
   .note > summary { color: var(--txt); font-weight: 800; }
   .gate { margin: 40px 0; padding: 18px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); font-size: 15px; line-height: 1.5; }
   .gate button { margin-top: 12px; }
+  .freshrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 16px; }
+  .freshrow .fresh { margin: 0; }
+  .stale { background: rgba(255,200,61,.12); border: 1px solid rgba(255,200,61,.5); color: var(--gold); border-radius: 12px; padding: 10px 12px; font-size: 13px; line-height: 1.4; margin-bottom: 14px; }
+  .logins { background: rgba(53,227,255,.08); border: 1px solid rgba(53,227,255,.4); border-radius: 16px; padding: 12px 14px; margin-bottom: 22px; font-size: 14px; line-height: 1.45; }
+  .logins b { color: var(--cyan); }
+  .lstat { flex: none; padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; border: 1.5px solid currentColor; }
+  .lstat.need { color: var(--hot); } .lstat.ok { color: var(--ok); } .lstat.none { color: var(--mut); }
   @media (prefers-reduced-motion: no-preference) { .ucard, .card, .item { animation: in .35s ease-out both; } @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } } }
 </style>
 </head>
@@ -99,10 +106,11 @@
   <div class="kicker" id="kicker">College HQ</div>
   <h1><b id="who">College</b><br><span>App Tracker</span></h1>
   <p class="sub">Every school, every deadline, every missing piece. Tap a button to jump to the portal, email the school, or call them.</p>
-  <p class="fresh" id="fresh">Loading the latest. This can take up to 10 seconds…</p>
+  <div class="freshrow"><p class="fresh" id="fresh">Loading the latest. This can take up to 10 seconds…</p><button class="chip" type="button" id="refresh">↻ Refresh</button></div>
   <div class="gate" id="gate" hidden></div>
   <div id="main">
 
+  <div class="stale" id="stale" hidden></div>
   <div class="stats">
     <div class="stat"><div class="stat-num" id="n-total">…</div><div class="stat-lbl">Schools</div></div>
     <div class="stat hot"><div class="stat-num" id="n-Urgent">…</div><div class="stat-lbl">🔥 Urgent</div></div>
@@ -111,6 +119,7 @@
   </div>
 
   <div class="next" id="next"></div>
+  <div class="logins" id="logins" hidden></div>
 
   <h2 id="do-now">🔥 Do this now <small>Most urgent first</small></h2>
   <div class="stack" id="urgent"></div>
@@ -133,12 +142,16 @@
   </div>
   <div class="grid" id="grid"></div>
 
+  <h2 id="portal-logins">🔐 Portal logins <small>Checked in Chrome on the Windows laptop</small></h2>
+  <div class="book" id="portals"></div>
+
   <h2 id="contacts">📇 Admissions contacts <small>Email or call any school</small></h2>
   <div class="book" id="book"></div>
 
   <details class="note">
     <summary>How this works</summary>
     <p>Claude checks <span class="fill-short">the student</span>'s admissions email every hour and reads the Common App dashboard and any signed-in school portal twice a day, then updates this page. New schools show up within an hour of their application confirmation. Urgent news is texted to the family right away; anything that comes in between 10 PM and 7 AM is texted at 7 AM. Nothing is ever submitted, changed or paid for without Mom's OK.</p>
+    <p>Portal logins: Claude can only read a school portal that is already signed in on the Windows laptop's Chrome. If a portal says Login needed, someone has to sign in there; logging in on your phone doesn't help. The Refresh button loads the newest data Claude has saved.</p>
     <p>Email buttons open a message to the school with the student's name and ID numbers already filled in; add your question and send it from your own email. Call buttons dial the admissions office.</p>
     <p>Urgent: something is missing or a deadline is here. To do: a submission or decision is waiting on the family. To verify: the school's own checklist still needs a look. Done: the school says the file is complete. School badges use initials and colors, not official logos.</p>
   </details>
@@ -179,6 +192,13 @@ function render(D) {
     if (r.contact_form && r.contact_form.indexOf('https:') === 0) w.appendChild(link('📝 Contact form ↗', r.contact_form, 'talk'));
     return w;
   }
+  function portalState(s) {
+    s = String(s || '');
+    if (/login needed|signed out/i.test(s)) return { cls: 'need', icon: '🔒', text: 'Login needed' };
+    if (/signed in/i.test(s)) return { cls: 'ok', icon: '🔓', text: 'Signed in' };
+    if (s) return { cls: 'none', icon: '○', text: s };
+    return null;
+  }
   function contactBlock(r) {
     if (!r.contact_email && !r.contact_phone && !r.contact_form) return null;
     var c = el('div', 'contact');
@@ -189,6 +209,8 @@ function render(D) {
 
   // freshness
   document.getElementById('fresh').textContent = '';
+  var lastMs = (+meta.last_check_epoch || 0) * 1000 || Date.parse(meta.updated_at || '');
+  if (lastMs && !isNaN(lastMs) && Date.now() - lastMs > 2.5 * 3600 * 1000) { var sw = document.getElementById('stale'); sw.hidden = false; sw.textContent = '⚠️ Claude hasn’t been able to check since ' + (meta.updated_at || 'a while') + '. The Windows laptop may be asleep or Chrome may be closed.'; }
   if (meta.updated_at) document.getElementById('fresh').textContent = 'Last refreshed ' + meta.updated_at + (meta.updated_by ? ' by ' + meta.updated_by : '');
 
   // stats
@@ -286,7 +308,9 @@ function render(D) {
       var ft = el('div', 'foot'), a = el('span'), b = el('span');
       a.appendChild(el('b', null, 'Deadline ')); a.appendChild(document.createTextNode(r.deadline));
       b.appendChild(el('b', null, 'Checked ')); b.appendChild(document.createTextNode(r.last_checked + ' · ' + r.checked_via));
-      ft.appendChild(a); ft.appendChild(b); c.appendChild(ft);
+      ft.appendChild(a); ft.appendChild(b);
+      var pl = portalState(r.portal_login); if (pl) { var ps = el('span'); ps.appendChild(el('b', null, 'Portal ')); ps.appendChild(document.createTextNode(pl.icon + ' ' + pl.text)); ft.appendChild(ps); }
+      c.appendChild(ft);
       c.appendChild(actionBtns(r));
       var cb = contactBlock(r); if (cb) c.appendChild(cb);
       g.appendChild(c);
@@ -300,6 +324,30 @@ function render(D) {
       drawGrid();
     });
   });
+
+  // portal logins
+  var pTiles = S.filter(function (r) { return r.portal_login; }).map(function (r) { return { r: r, name: r.school, st: portalState(r.portal_login), url: r.portal_url }; });
+  [['Common App', 'CA', meta.commonapp_login, 'https://apply.commonapp.org/dashboard'], ['STARS self-reported transcript', 'SR', meta.stars_login, 'https://srar.selfreportedtranscript.com']].forEach(function (x) { if (x[2]) pTiles.push({ r: { abbr: x[1], color: '#2b3550', fg: '#c8ff2e' }, name: x[0], st: portalState(x[2]), url: x[3] }); });
+  var order = { need: 0, ok: 1, none: 2 };
+  pTiles.sort(function (a, b) { return order[a.st.cls] - order[b.st.cls] || String(a.name).localeCompare(String(b.name)); });
+  var need = pTiles.filter(function (p) { return p.st.cls === 'need'; });
+  var lg = document.getElementById('logins');
+  if (need.length) {
+    lg.hidden = false;
+    var lm = el('div'); lm.appendChild(el('b', null, '🔒 Claude can’t see ' + need.length + (need.length === 1 ? ' portal: ' : ' portals: ')));
+    lm.appendChild(document.createTextNode(need.map(function (p) { return p.name; }).join(', ') + '. Sign in to ' + (need.length === 1 ? 'it' : 'them') + ' in Chrome on the Windows laptop so ' + (need.length === 1 ? 'it gets' : 'they get') + ' checked.'));
+    lg.appendChild(lm);
+    var jb = el('div', 'btns'), jump = el('a', 'btn talk', 'See all logins ↓'); jump.href = '#portal-logins'; jb.appendChild(jump); lg.appendChild(jb);
+  }
+  var pt = document.getElementById('portals');
+  pTiles.forEach(function (p) {
+    var row = el('div', 'book-row'); row.appendChild(badge(p.r, true));
+    row.appendChild(el('div', 'name', p.name));
+    row.appendChild(el('span', 'lstat ' + p.st.cls, p.st.icon + ' ' + p.st.text));
+    if (p.st.cls === 'need' && p.url && p.url.indexOf('https://') === 0) { var lb = el('div', 'btns'); lb.appendChild(link('Log in ↗', p.url, 'primary')); row.appendChild(lb); }
+    pt.appendChild(row);
+  });
+  if (!pTiles.length) pt.appendChild(el('div', 'empty', 'No portal info yet.'));
 
   // contact book
   var bk = document.getElementById('book');
@@ -315,6 +363,7 @@ function render(D) {
   var API = 'https://script.google.com/macros/s/AKfycbyfTfj4hBPk7gdv7mVJsvUt0wNCvCU_f-Wik2aS2-MvQfqo0hTGgFtqHbsxacSFMJog/exec';
   var key = new URLSearchParams(location.search).get('k') || '';
   var loadedAt = 0;
+  var rb = document.getElementById('refresh'); if (rb) rb.onclick = function () { rb.textContent = 'Refreshing…'; rb.disabled = true; location.reload(); };
   function gate(msg, retry) {
     document.getElementById('fresh').textContent = '';
     document.getElementById('main').hidden = true;
