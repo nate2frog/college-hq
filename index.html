@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>College HQ</title>
+<style>
+  :root { --bg:#070b14; --panel:#101828; --panel2:#162138; --line:rgba(255,255,255,.09); --txt:#f5f7fc; --mut:#9aa7c4; --hot:#ff4d2e; --volt:#c8ff2e; --cyan:#35e3ff; --gold:#ffc83d; --ok:#2ee59d; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); }
+  body { color: var(--txt); font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-text-size-adjust: 100%;
+    background: radial-gradient(1200px 500px at 85% -10%, rgba(53,227,255,.18), transparent 60%), radial-gradient(900px 500px at -10% 0%, rgba(255,77,46,.20), transparent 55%), var(--bg); background-attachment: fixed; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 18px 16px 40px; }
+  .kicker { font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--volt); }
+  h1 { margin: 6px 0 2px; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -.02em; line-height: .92; font-size: clamp(34px, 9vw, 64px); }
+  h1 b { font-weight: inherit; }
+  h1 span { background: linear-gradient(90deg, var(--volt), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--mut); font-size: 14px; margin: 8px 0 4px; max-width: 60ch; }
+  .fresh { color: var(--mut); font-size: 12px; margin: 0 0 16px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px 10px 8px; }
+  .stat-num { font-size: clamp(26px, 7vw, 38px); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat-lbl { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); margin-top: 4px; }
+  .stat.hot .stat-num { color: var(--hot); } .stat.volt .stat-num { color: var(--gold); } .stat.ok .stat-num { color: var(--ok); }
+  .next { display: flex; align-items: center; gap: 14px; background: linear-gradient(100deg, rgba(255,77,46,.95), rgba(255,140,40,.9)); color: #140600; border-radius: 16px; padding: 12px 16px; margin-bottom: 22px; box-shadow: 0 10px 30px rgba(255,77,46,.25); }
+  .next-days { font-size: 40px; font-weight: 900; line-height: .9; font-variant-numeric: tabular-nums; min-width: 1.4em; text-align: center; }
+  .next-unit { font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; text-align: center; }
+  .next-k { font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+  .next-what { font-size: 16px; font-weight: 800; line-height: 1.2; }
+  h2 { display: flex; align-items: baseline; gap: 8px; margin: 24px 0 10px; font-size: 18px; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: .02em; }
+  h2 small { font-size: 11px; font-style: normal; font-weight: 700; color: var(--mut); letter-spacing: .08em; }
+  .badge { flex: none; display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 13px; font-weight: 900; font-size: 13px; letter-spacing: .02em; box-shadow: inset 0 0 0 2px rgba(255,255,255,.14); }
+  .badge.sm { width: 34px; height: 34px; border-radius: 10px; font-size: 10px; }
+  .stack { display: grid; gap: 10px; }
+  .ucard { background: linear-gradient(180deg, rgba(255,77,46,.12), rgba(255,77,46,.03)), var(--panel); border: 1px solid rgba(255,77,46,.45); border-radius: 16px; padding: 14px; }
+  .row { display: flex; gap: 12px; align-items: center; }
+  .name { font-size: 16px; font-weight: 800; line-height: 1.2; }
+  .meta { font-size: 12px; color: var(--mut); margin-top: 2px; }
+  .lab { font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); margin-top: 10px; }
+  .lab.miss { color: var(--hot); }
+  .txt { font-size: 14px; line-height: 1.45; margin-top: 2px; }
+  .due { margin-left: auto; flex: none; text-align: center; min-width: 74px; padding: 6px 8px; border-radius: 12px; background: rgba(255,255,255,.06); border: 1.5px solid rgba(255,255,255,.18); }
+  .due.now { background: var(--hot); border-color: var(--hot); color: #160500; }
+  .due.soon { background: var(--gold); border-color: var(--gold); color: #1a1200; }
+  .due-k { font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; opacity: .85; }
+  .due-d { font-size: 18px; font-weight: 900; line-height: 1.05; text-transform: uppercase; }
+  .due-n { font-size: 10px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 9px 14px; border-radius: 999px; font-size: 13px; font-weight: 800; text-decoration: none; border: 1.5px solid rgba(255,255,255,.22); background: rgba(255,255,255,.04); color: var(--txt); }
+  .btn.primary { background: var(--volt); color: #0b1200; border-color: var(--volt); }
+  .btn.talk { border-color: rgba(53,227,255,.55); color: var(--cyan); }
+  .btn:active { transform: scale(.98); }
+  .item { display: flex; gap: 10px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--mut); border-radius: 12px; padding: 10px 12px; }
+  .item.urgent { border-left-color: var(--hot); } .item.good { border-left-color: var(--ok); } .item.action { border-left-color: var(--gold); } .item.info { border-left-color: var(--cyan); }
+  .date { font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); }
+  .new { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 6px; background: var(--volt); color: #0b1200; font-size: 9px; font-weight: 900; letter-spacing: .1em; }
+  details.more { margin-top: 8px; }
+  details summary { cursor: pointer; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  .more > summary { color: var(--cyan); font-size: 13px; font-weight: 800; }
+  .strip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+  .tile { flex: 0 0 auto; width: 158px; scroll-snap-align: start; background: var(--panel2); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+  .tile.decision { background: linear-gradient(180deg, rgba(53,227,255,.14), rgba(53,227,255,.02)), var(--panel2); border-color: rgba(53,227,255,.35); }
+  .tile-days { font-size: 30px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  .tile-unit { font-size: 10px; font-weight: 900; letter-spacing: .12em; color: var(--mut); text-transform: uppercase; }
+  .tile-what { font-size: 12px; line-height: 1.35; margin-top: 8px; }
+  .tile-kind { font-size: 9px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-top: 8px; }
+  .tile.decision .tile-kind { color: var(--cyan); }
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; }
+  .chip { flex: none; min-height: 36px; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--panel); color: var(--txt); font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--txt); color: var(--bg); border-color: var(--txt); }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  @media (min-width: 720px) { .grid { grid-template-columns: 1fr 1fr; } .wrap { padding: 26px 24px 44px; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; }
+  .pill { margin-left: auto; flex: none; padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; border: 1.5px solid currentColor; }
+  .pill.Urgent { color: var(--hot); } .pill.Action { color: var(--gold); } .pill.Verify { color: var(--cyan); } .pill.Complete { color: var(--ok); }
+  .foot { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 12px; color: var(--mut); }
+  .foot b { color: var(--txt); font-weight: 800; }
+  .got > summary { font-size: 12px; font-weight: 800; color: var(--ok); margin-top: 10px; }
+  .contact { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); }
+  .contact-who { font-size: 12px; color: var(--mut); }
+  .empty { color: var(--mut); font-size: 14px; padding: 10px 0; }
+  .book { display: grid; gap: 8px; }
+  .book-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .book-row .name { font-size: 14px; flex: 1 1 180px; }
+  .book-row .btns { margin-top: 0; }
+  .note { margin-top: 28px; color: var(--mut); font-size: 12px; line-height: 1.5; }
+  .note > summary { color: var(--txt); font-weight: 800; }
+  .gate { margin: 40px 0; padding: 18px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); font-size: 15px; line-height: 1.5; }
+  .gate button { margin-top: 12px; }
+  @media (prefers-reduced-motion: no-preference) { .ucard, .card, .item { animation: in .35s ease-out both; } @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker" id="kicker">College HQ</div>
+  <h1><b id="who">College</b><br><span>App Tracker</span></h1>
+  <p class="sub">Every school, every deadline, every missing piece. Tap a button to jump to the portal, email the school, or call them.</p>
+  <p class="fresh" id="fresh">Loading the latest. This can take up to 10 seconds…</p>
+  <div class="gate" id="gate" hidden></div>
+  <div id="main">
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="n-total">…</div><div class="stat-lbl">Schools</div></div>
+    <div class="stat hot"><div class="stat-num" id="n-Urgent">…</div><div class="stat-lbl">🔥 Urgent</div></div>
+    <div class="stat volt"><div class="stat-num" id="n-Action">…</div><div class="stat-lbl">⚡ To do</div></div>
+    <div class="stat ok"><div class="stat-num" id="n-Complete">…</div><div class="stat-lbl">✅ Done</div></div>
+  </div>
+
+  <div class="next" id="next"></div>
+
+  <h2 id="do-now">🔥 Do this now <small>Most urgent first</small></h2>
+  <div class="stack" id="urgent"></div>
+
+  <h2 id="just-in">📬 Just in <small>Newest first</small></h2>
+  <div class="stack" id="feed"></div>
+  <details class="more"><summary>Show older updates</summary><div class="stack" style="margin-top:8px" id="feed-older"></div></details>
+
+  <h2 id="coming-up">🗓️ Coming up <small>Deadlines and decision days</small></h2>
+  <div class="strip" id="upcoming"></div>
+
+  <h2 id="every-school">🏫 Every school</h2>
+  <div class="chips" id="filters" role="group" aria-label="Filter schools">
+    <button class="chip" type="button" data-filter="" aria-pressed="true">All</button>
+    <button class="chip" type="button" data-filter="Urgent" aria-pressed="false">🔥 Urgent</button>
+    <button class="chip" type="button" data-filter="Action" aria-pressed="false">⚡ To do</button>
+    <button class="chip" type="button" data-filter="Verify" aria-pressed="false">🔍 To verify</button>
+    <button class="chip" type="button" data-filter="Complete" aria-pressed="false">✅ Done</button>
+    <button class="chip" type="button" data-filter="recent" aria-pressed="false">🆕 Newest</button>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <h2 id="contacts">📇 Admissions contacts <small>Email or call any school</small></h2>
+  <div class="book" id="book"></div>
+
+  <details class="note">
+    <summary>How this works</summary>
+    <p>Claude checks <span class="fill-short">the student</span>'s admissions email every hour and reads the Common App dashboard and any signed-in school portal twice a day, then updates this page. New schools show up within an hour of their application confirmation. Urgent news is texted to the family right away; anything that comes in between 10 PM and 7 AM is texted at 7 AM. Nothing is ever submitted, changed or paid for without Mom's OK.</p>
+    <p>Email buttons open a message to the school with the student's name and ID numbers already filled in; add your question and send it from your own email. Call buttons dial the admissions office.</p>
+    <p>Urgent: something is missing or a deadline is here. To do: a submission or decision is waiting on the family. To verify: the school's own checklist still needs a look. Done: the school says the file is complete. School badges use initials and colors, not official logos.</p>
+  </details>
+  </div>
+</div>
+
+<script>
+function render(D) {
+  D = D || { schools: [], updates: [], meta: [] };
+  var meta = {}; (D.meta || []).forEach(function (m) { meta[m.key] = m.value; });
+  var SHORT = meta.student_short || '', FULL = meta.student_full || 'the student', CAID = meta.common_app_id || '';
+  if (SHORT) { document.getElementById('who').textContent = SHORT + '\u2019s'; document.title = SHORT + '\u2019s College HQ'; Array.prototype.forEach.call(document.querySelectorAll('.fill-short'), function (x) { x.textContent = SHORT; }); }
+  if (meta.class_of) document.getElementById('kicker').textContent = 'Class of ' + meta.class_of + ' \u00b7 College HQ';
+  var S = D.schools || [], U = D.updates || [];
+  var filter = '';
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function parse(s) { var m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})/.exec(String(s || '')); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+  function fmt(s) { var d = parse(s); return d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''; }
+  var now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  function days(s) { var d = parse(s); return d ? Math.round((d - today) / 86400000) : null; }
+  function badge(r, small) { var b = el('span', 'badge' + (small ? ' sm' : ''), r.abbr || ''); b.style.background = r.color || '#2b3550'; b.style.color = r.fg || '#fff'; b.setAttribute('aria-hidden', 'true'); return b; }
+  function link(label, href, cls) { var a = el('a', 'btn' + (cls ? ' ' + cls : ''), label); a.href = href; if (href.indexOf('https:') === 0) { a.target = '_blank'; a.rel = 'noopener noreferrer'; } return a; }
+  function actionBtns(r) {
+    var w = el('div', 'btns');
+    for (var i = 1; i <= 3; i++) { var u = r['link' + i + '_url'], l = r['link' + i + '_label']; if (u && u.indexOf('https://') === 0) w.appendChild(link(l + ' ↗', u, i === 1 ? 'primary' : '')); }
+    return w;
+  }
+  function mailto(r) {
+    var subj = 'Question about ' + FULL + '\u2019s application' + (CAID ? ' (Common App ID ' + CAID + ')' : '');
+    var ids = [CAID ? 'Common App ID ' + CAID : '', r.school_ref || ''].filter(Boolean).join(', ');
+    var NL = String.fromCharCode(10); var body = 'Hello,' + NL + NL + 'I am writing about the application for ' + FULL + (ids ? ' (' + ids + ')' : '') + '.' + NL + NL + '[Your question here]' + NL + NL + 'Thank you,' + NL;
+    return 'mailto:' + r.contact_email + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+  }
+  function talkBtns(r) {
+    var w = el('div', 'btns');
+    if (r.contact_email) w.appendChild(link('✉️ Email', mailto(r), 'talk'));
+    if (r.contact_phone) w.appendChild(link('📞 Call ' + r.contact_phone, 'tel:+1' + r.contact_phone.replace(/[^0-9]/g, ''), 'talk'));
+    if (r.contact_form && r.contact_form.indexOf('https:') === 0) w.appendChild(link('📝 Contact form ↗', r.contact_form, 'talk'));
+    return w;
+  }
+  function contactBlock(r) {
+    if (!r.contact_email && !r.contact_phone && !r.contact_form) return null;
+    var c = el('div', 'contact');
+    c.appendChild(el('div', 'contact-who', 'Talk to ' + (r.contact_name || 'admissions')));
+    var b = talkBtns(r); b.style.marginTop = '8px'; c.appendChild(b);
+    return c;
+  }
+
+  // freshness
+  document.getElementById('fresh').textContent = '';
+  if (meta.updated_at) document.getElementById('fresh').textContent = 'Last refreshed ' + meta.updated_at + (meta.updated_by ? ' by ' + meta.updated_by : '');
+
+  // stats
+  document.getElementById('n-total').textContent = S.length;
+  ['Urgent', 'Action', 'Complete'].forEach(function (p) { document.getElementById('n-' + p).textContent = S.filter(function (r) { return r.priority === p; }).length; });
+
+  // upcoming
+  var up = [];
+  S.forEach(function (r) {
+    [['due', 'due_date', 'due_label'], ['decision', 'decision_date', 'decision_label']].forEach(function (k) {
+      var n = days(r[k[1]]); if (n == null || n < 0) return;
+      up.push({ r: r, kind: k[0], date: r[k[1]], label: r[k[2]], days: n });
+    });
+  });
+  up.sort(function (a, b) { return a.days - b.days || String(a.r.school).localeCompare(String(b.r.school)); });
+
+  var nx = document.getElementById('next'), firstDue = up.filter(function (x) { return x.kind === 'due'; })[0];
+  if (firstDue) {
+    var l = el('div'); l.appendChild(el('div', 'next-days', String(firstDue.days))); l.appendChild(el('div', 'next-unit', firstDue.days === 0 ? 'Today' : firstDue.days === 1 ? 'Day left' : 'Days left'));
+    var rr = el('div'); rr.appendChild(el('div', 'next-k', 'Next deadline · ' + firstDue.r.school)); rr.appendChild(el('div', 'next-what', firstDue.label));
+    nx.appendChild(l); nx.appendChild(rr);
+  } else { nx.appendChild(el('div', 'next-what', 'No deadlines ahead right now.')); }
+
+  var st = document.getElementById('upcoming');
+  if (!up.length) st.appendChild(el('div', 'empty', 'No dates on the board.'));
+  up.forEach(function (x) {
+    var t = el('div', 'tile ' + x.kind), top = el('div', 'row'), num = el('div');
+    num.appendChild(el('div', 'tile-days', String(x.days))); num.appendChild(el('div', 'tile-unit', x.days === 0 ? 'Today' : x.days === 1 ? 'Day' : 'Days'));
+    var b = badge(x.r, true); b.style.marginLeft = 'auto';
+    top.appendChild(num); top.appendChild(b); t.appendChild(top);
+    t.appendChild(el('div', 'tile-kind', (x.kind === 'decision' ? '🎓 Decision · ' : '⏰ Due · ') + fmt(x.date)));
+    t.appendChild(el('div', 'tile-what', x.label));
+    st.appendChild(t);
+  });
+
+  // urgent
+  var ug = document.getElementById('urgent');
+  var urg = S.filter(function (r) { return r.priority === 'Urgent'; }).sort(function (a, b) { return String(a.due_date || a.deadline_sort).localeCompare(String(b.due_date || b.deadline_sort)); });
+  if (!urg.length) ug.appendChild(el('div', 'empty', 'Nothing urgent right now. 🙌'));
+  urg.forEach(function (r) {
+    var c = el('article', 'ucard'), h = el('div', 'row'), t = el('div');
+    t.appendChild(el('div', 'name', r.school)); t.appendChild(el('div', 'meta', r.deadline));
+    h.appendChild(badge(r)); h.appendChild(t);
+    var ds = r.due_date || r.deadline_sort, n = days(ds);
+    if (n != null) {
+      var chip = el('div', 'due' + (n <= 0 ? ' now' : n <= 3 ? ' soon' : ''));
+      if (n < 0) { chip.appendChild(el('div', 'due-k', 'Was due')); chip.appendChild(el('div', 'due-d', fmt(ds))); chip.appendChild(el('div', 'due-n', 'Do it ASAP')); }
+      else if (n === 0) { chip.appendChild(el('div', 'due-k', 'Due')); chip.appendChild(el('div', 'due-d', 'Today')); chip.appendChild(el('div', 'due-n', fmt(ds))); }
+      else { chip.appendChild(el('div', 'due-k', 'Due')); chip.appendChild(el('div', 'due-d', fmt(ds))); chip.appendChild(el('div', 'due-n', 'In ' + n + (n === 1 ? ' day' : ' days'))); }
+      h.appendChild(chip);
+    }
+    c.appendChild(h);
+    c.appendChild(el('div', 'lab miss', 'Missing')); c.appendChild(el('div', 'txt', r.missing));
+    c.appendChild(el('div', 'lab', 'Your move')); c.appendChild(el('div', 'txt', r.action));
+    c.appendChild(actionBtns(r));
+    var cb = contactBlock(r); if (cb) c.appendChild(cb);
+    ug.appendChild(c);
+  });
+
+  // feed
+  var feed = U.map(function (r, i) { return [r, i]; }).sort(function (a, b) { return String(b[0].date_sort).localeCompare(String(a[0].date_sort)) || a[1] - b[1]; });
+  function item(r) {
+    var it = el('div', 'item ' + (r.kind || 'info')), body = el('div');
+    var dt = el('div', 'date', fmt(r.date_sort) + ' · ' + (r.abbr === 'ALL' ? 'All schools' : r.abbr));
+    var n = days(r.date_sort); if (n != null && n >= -1) dt.appendChild(el('span', 'new', 'NEW'));
+    body.appendChild(dt); body.appendChild(el('div', 'txt', r.text));
+    it.appendChild(badge(r, true)); it.appendChild(body); return it;
+  }
+  var f1 = document.getElementById('feed'), f2 = document.getElementById('feed-older');
+  feed.slice(0, 6).forEach(function (x) { f1.appendChild(item(x[0])); });
+  feed.slice(6).forEach(function (x) { f2.appendChild(item(x[0])); });
+  if (!feed.length) f1.appendChild(el('div', 'empty', 'No updates yet.'));
+  if (feed.length <= 6) f2.appendChild(el('div', 'empty', 'No older updates.'));
+
+  // grid
+  var label = { Urgent: '🔥 Urgent', Action: '⚡ To do', Verify: '🔍 Verify', Complete: '✅ Done' };
+  function drawGrid() {
+    var g = document.getElementById('grid'); g.innerHTML = '';
+    var rows = S.slice();
+    if (filter === 'recent') rows.sort(function (a, b) { return String(b.updated_sort).localeCompare(String(a.updated_sort)) || (+a.rank) - (+b.rank); });
+    else {
+      if (filter) rows = rows.filter(function (r) { return r.priority === filter; });
+      rows.sort(function (a, b) { return (+a.rank) - (+b.rank) || String(a.deadline_sort).localeCompare(String(b.deadline_sort)) || String(a.school).localeCompare(String(b.school)); });
+    }
+    if (!rows.length) { g.appendChild(el('div', 'empty', 'No schools here.')); return; }
+    rows.forEach(function (r) {
+      var c = el('article', 'card'), h = el('div', 'row'), t = el('div');
+      t.appendChild(el('div', 'name', r.school)); t.appendChild(el('div', 'meta', r.plan));
+      h.appendChild(badge(r)); h.appendChild(t); h.appendChild(el('span', 'pill ' + r.priority, label[r.priority] || r.priority));
+      c.appendChild(h);
+      c.appendChild(el('div', 'lab', 'Status')); c.appendChild(el('div', 'txt', r.status));
+      if (r.missing && !/^none/i.test(r.missing)) { c.appendChild(el('div', 'lab', 'Missing')); c.appendChild(el('div', 'txt', r.missing)); }
+      if (r.action && !/^none/i.test(r.action)) { c.appendChild(el('div', 'lab', 'Next move')); c.appendChild(el('div', 'txt', r.action)); }
+      if (r.received && !/^none$/i.test(r.received)) { var d = el('details', 'got'); d.appendChild(el('summary', null, '✓ What they have')); d.appendChild(el('div', 'txt', r.received)); c.appendChild(d); }
+      var ft = el('div', 'foot'), a = el('span'), b = el('span');
+      a.appendChild(el('b', null, 'Deadline ')); a.appendChild(document.createTextNode(r.deadline));
+      b.appendChild(el('b', null, 'Checked ')); b.appendChild(document.createTextNode(r.last_checked + ' · ' + r.checked_via));
+      ft.appendChild(a); ft.appendChild(b); c.appendChild(ft);
+      c.appendChild(actionBtns(r));
+      var cb = contactBlock(r); if (cb) c.appendChild(cb);
+      g.appendChild(c);
+    });
+  }
+  drawGrid();
+  Array.prototype.forEach.call(document.querySelectorAll('#filters .chip'), function (chip) {
+    chip.addEventListener('click', function () {
+      filter = chip.getAttribute('data-filter') || '';
+      Array.prototype.forEach.call(document.querySelectorAll('#filters .chip'), function (x) { x.setAttribute('aria-pressed', x === chip ? 'true' : 'false'); });
+      drawGrid();
+    });
+  });
+
+  // contact book
+  var bk = document.getElementById('book');
+  S.slice().sort(function (a, b) { return String(a.school).localeCompare(String(b.school)); }).forEach(function (r) {
+    if (!r.contact_email && !r.contact_phone && !r.contact_form) return;
+    var row = el('div', 'book-row'); row.appendChild(badge(r, true));
+    var n = el('div', 'name', r.school); n.appendChild(el('div', 'contact-who', r.contact_name || '')); row.appendChild(n);
+    row.appendChild(talkBtns(r)); bk.appendChild(row);
+  });
+}
+
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbyfTfj4hBPk7gdv7mVJsvUt0wNCvCU_f-Wik2aS2-MvQfqo0hTGgFtqHbsxacSFMJog/exec';
+  var key = new URLSearchParams(location.search).get('k') || '';
+  var loadedAt = 0;
+  function gate(msg, retry) {
+    document.getElementById('fresh').textContent = '';
+    document.getElementById('main').hidden = true;
+    var g = document.getElementById('gate'); g.hidden = false; g.textContent = msg;
+    if (retry) { var b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = 'Try again'; b.onclick = function () { location.reload(); }; g.appendChild(document.createElement('br')); g.appendChild(b); }
+  }
+  if (!key) { gate('This link is private. Open the full link you were sent.'); return; }
+  fetch(API + '?format=json&k=' + encodeURIComponent(key), { credentials: 'omit', cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (D) {
+      if (!D || D.error) { gate('This link is private. Open the full link you were sent.'); return; }
+      render(D); loadedAt = Date.now();
+    })
+    .catch(function () { gate('Couldn\u2019t load the tracker. Check your connection.', true); });
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible' && loadedAt && Date.now() - loadedAt > 5 * 60 * 1000) location.reload();
+  });
+})();
+</script>
+</body>
+</html>
